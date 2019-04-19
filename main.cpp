@@ -31,10 +31,12 @@ public:
 };
 
 class Graph{
+protected:
+	int _size;
 
 public:
 	virtual void addEdge(int a, int b);
-	virtual int size();
+	int size();
 	virtual ~Graph();
 };
 
@@ -70,7 +72,9 @@ public:
 
 };
 
-
+int Graph::size(){
+	return _size;
+}
 
 ///////  Linked List implementations
 
@@ -269,9 +273,9 @@ AdjMatrix::~AdjMatrix(){
 
 	delete[] _myMatrix;
 }
-int AdjMatrix::size(){
-	return _size;
-}
+//int AdjMatrix::size(){
+//	return _size;
+//}
 void AdjMatrix::addEdge(int a, int b){
 	// add an edge to this graph
 	// the edge is represented as a connection between the two nodes, a and b
@@ -302,6 +306,7 @@ AdjMatrix& AdjMatrix::operator=(const AdjMatrix& M){
 
 	return *this;
 }
+
 
 /////// AdjList Implementations
 
@@ -362,12 +367,12 @@ AdjList::~AdjList(){
 
 	delete[] _myList;
 }
-int AdjList::size(){
-	// return the number of nodes in this list
-	return _size;
-}
+//int AdjList::size(){
+//	// return the number of nodes in this list
+//	return _size;
+//}
 void AdjList::addEdge(int a, int b){
-	// add the indicies (a,b) and (b,a) to this list
+	// add the indices (a,b) and (b,a) to this list
 	(*_myList[a]).add(b);
 	(*_myList[b]).add(a);
 }
@@ -403,50 +408,77 @@ AdjList& AdjList::operator=(const AdjList& M){
 }
 
 
-void BFS(int node, int* visited){
+void BFS(int node, bool* visited, queue<int> Q, Graph g){
 
-}
-void startBFS(Graph g){
-	int size = g.size();
-
-	int* visited = new int[size];
-
-	for(int i = 0; i < size; ++i){
-		visited[i] = false;
-	}
-
-	int node = 0;
-	BFS(node, visited);
-
-	delete[] visited;
-}
-void DFS(int node, int* visited){
-
+	Q.push(node);
 	visited[node] = true;
 
-	// for every neighbor of x
+	while(!Q.empty()){
+		int currNode = Q.front();
+		Q.pop();
 
-	if(!visited[neighbor]){
-		parent[neighbor] = x;
-		DFS(neighbor);
+		// for each unvisited neighbor of k
+
+
 	}
-}
-void startDFS(Graph g){
-	int size = g.size();
 
-	int* visited = new int[size];
+}
+
+void startBFS(Graph g, int firstNode){
+	int size = g.size();
+	bool* visited = new bool[size];
+	queue<int>* Q = new queue<int>();
 
 	for(int i = 0; i < size; ++i){
 		visited[i] = false;
 	}
 
-	int node = 0;
-	DFS(node, visited);
+	BFS(firstNode, visited, Q, g);
 
 	delete[] visited;
-
 }
 
+//void DFS(int node, int* visited){
+//
+//	visited[node] = true;
+//
+//	// for every neighbor of x
+//
+//	if(!visited[neighbor]){
+//		parent[neighbor] = x;
+//		DFS(neighbor);
+//	}
+//}
+//void startDFS(Graph g){
+//	int size = g.size();
+//
+//	int* visited = new int[size];
+//
+//	for(int i = 0; i < size; ++i){
+//		visited[i] = false;
+//	}
+//
+//	int node = 0;
+//	DFS(node, visited);
+//
+//	delete[] visited;
+//
+//}
+
 int main(){
+
+	int numNodes, x, y;
+
+	cin >> numNodes;
+
+	AdjMatrix* myAM = new AdjMatrix(numNodes);
+	AdjList* myAL = new AdjList(numNodes);
+
+	while(!cin.eof()){
+		cin >> x >> y;
+
+		(*myAM).addEdge(x, y);
+		(*myAL).addEdge(x, y);
+	}
 
 }
