@@ -50,13 +50,14 @@ public:
 	~AdjMatrix();
 	int size();
 	void addEdge(int a, int b);
+	AdjMatrix& operator=(const AdjMatrix& M);
 
 };
 
 class AdjList: public Graph {
 protected:
 	int _size;
-	LinkedList<int>* _myList;
+	LinkedList<int>** _myList;
 
 public:
 	AdjList();
@@ -65,7 +66,7 @@ public:
 	~AdjList();
 	int size();
 	void addEdge(int a, int b);
-
+	AdjList& operator=(const AdjList& M);
 
 };
 
@@ -234,6 +235,13 @@ AdjMatrix::AdjMatrix(int size){
 		_myMatrix[i] = new int[size];
 	}
 	_size = size;
+
+	// set all values in the matrix to
+	for(int i = 0; i < _size; ++i){
+		for(int j = 0; j < _size; ++j){
+			_myMatrix[i][j] = 0;
+		}
+	}
 }
 AdjMatrix::AdjMatrix(AdjMatrix& M){
 	// copy constructor, after transfering size var and creating this matrix using size
@@ -267,14 +275,137 @@ int AdjMatrix::size(){
 void AdjMatrix::addEdge(int a, int b){
 	// add an edge to this graph
 	// the edge is represented as a connection between the two nodes, a and b
-
+	// set the indices (a,b) and (b,a) in the matrix to one
+	_myMatrix[a][b] = 1;
+	_myMatrix[b][a] = 1;
 
 }
+AdjMatrix& AdjMatrix::operator=(const AdjMatrix& M){
+	// overload the = operator
+	// copied the code from the copy constructor
+	// the this object is inherent in the = assignment operator
+
+	// after transfering size var and creating this matrix using size
+	// transfer contents of matrix in M to this matrix
+	_size = M._size;
+	_myMatrix = new int*[_size];
+	for(int i = 0; i < _size; ++i){
+		_myMatrix[i] = new int[_size];
+	}
+
+	// transfer the data
+	for(int i = 0; i < _size; ++i){
+		for(int j = 0; j < _size; ++j){
+			_myMatrix[i][j] = M._myMatrix[i][j];
+		}
+	}
+
+	return *this;
+}
+
+/////// AdjList Implementations
+
+
+AdjList::AdjList(){
+	// default constructor, set size to 10
+	_size = 10;
+	_myList = new LinkedList<int>*[10];
+
+	// initiliaze each index as an empty LL link
+	for(int i = 0; i < _size; ++i){
+		_myList[i] = new LinkedList<int>();
+	}
+}
+AdjList::AdjList(int size){
+	// constructor with size param, set size to size param
+	_size = size;
+	_myList = new LinkedList<int>*[size];
+
+	// initiliaze each index as an empty LL link
+	for(int i = 0; i < size; ++i){
+		_myList[i] = new LinkedList<int>();
+	}
+}
+AdjList::AdjList(AdjList& M){
+	// copy constructor, copy the size from M, construct this list
+	// then copy M's list into this list
+	_size = M._size;
+	_myList = new LinkedList<int>*[_size];
+
+	// for every node in the graph
+	for(int i = 0; i < _size; ++i){
+
+		int MListSize = (*M._myList[i]).size();
+
+		// for every node in the LL in index i in M's list
+		for(int j = 0; j < MListSize; ++j){
+			// add a copy of  node to this list LL at the same index i
+			// get info from node j, index i in M.list
+			int mListInfo = (*M._myList[i]).infoAt(j);
+			// add a new node with that info to to the list at index i
+			// in this list
+			(*_myList[i]).add(mListInfo);
+		}
+
+	}
+}
+AdjList::~AdjList(){
+
+	// delete all LL in this list
+	// then delete this list
+
+	for(int i = 0; i < _size; ++i){
+		// _myList[i] returns a pointer to a LL
+		// delete takes a ptr to the LL object and deletes it
+		delete _myList[i];
+	}
+
+	delete[] _myList;
+}
+int AdjList::size(){
+	// return the number of nodes in this list
+	return _size;
+}
+void AdjList::addEdge(int a, int b){
+	// add the indicies (a,b) and (b,a) to this list
+	(*_myList[a]).add(b);
+	(*_myList[b]).add(a);
+}
+AdjList& AdjList::operator=(const AdjList& M){
+
+	// overload the = operator
+	// copied the code from the copy constructor
+	// the this object is inherent in the = assignment operator
+
+	// copy the size from M, construct this list
+	// then copy M's list into this list
+	_size = M._size;
+	_myList = new LinkedList<int>*[_size];
+
+	// for every node in the graph
+	for(int i = 0; i < _size; ++i){
+
+		int MListSize = (*M._myList[i]).size();
+
+		// for every node in the LL in index i in M's list
+		for(int j = 0; j < MListSize; ++j){
+			// add a copy of  node to this list LL at the same index i
+			// get info from node j, index i in M.list
+			int mListInfo = (*M._myList[i]).infoAt(j);
+			// add a new node with that info to to the list at index i
+			// in this list
+			(*_myList[i]).add(mListInfo);
+		}
+
+	}
+
+	return *this;
+}
+
 
 void BFS(int node, int* visited){
 
 }
-
 void startBFS(Graph g){
 	int size = g.size();
 
@@ -289,7 +420,6 @@ void startBFS(Graph g){
 
 	delete[] visited;
 }
-
 void DFS(int node, int* visited){
 
 	visited[node] = true;
@@ -301,7 +431,6 @@ void DFS(int node, int* visited){
 		DFS(neighbor);
 	}
 }
-
 void startDFS(Graph g){
 	int size = g.size();
 
