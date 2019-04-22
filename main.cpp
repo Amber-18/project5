@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <list>
 using namespace std;
 
 
@@ -36,9 +37,9 @@ protected:
 
 public:
 	virtual void addEdge(int a, int b);
-	int size(){ return _size; };
-	virtual int* getNeighbors(int node){ return new int(0); };
-	~Graph(){};
+	int size();
+	virtual int* getNeighbors(int node);
+	~Graph();
 };
 
 class AdjMatrix: public Graph {
@@ -51,10 +52,10 @@ public:
 	AdjMatrix(int size);
 	AdjMatrix(AdjMatrix& M);
 	~AdjMatrix();
-	int size();
 	void addEdge(int a, int b);
 	AdjMatrix& operator=(const AdjMatrix& M);
 	int* getNeighbors(int node);
+	friend ostream& operator<<(ostream& stream, const AdjMatrix& M);
 
 };
 
@@ -68,19 +69,27 @@ public:
 	AdjList(int size);
 	AdjList(AdjList& M);
 	~AdjList();
-	int size();
 	void addEdge(int a, int b);
 	AdjList& operator=(const AdjList& M);
 	int* getNeighbors(int node);
+	friend ostream& operator<<(ostream& stream, const AdjList& M);
 
 };
 
+void Graph::addEdge(int a, int b){
+// leave empty
+}
 int Graph::size(){
 	return _size;
+}
+int* Graph::getNeighbors(int node){
+	return new int(-1);
 }
 Graph::~Graph(){
 
 }
+
+
 ///////  Linked List implementations
 
 
@@ -319,8 +328,10 @@ int* AdjMatrix::getNeighbors(int node){
 	}
 
 	// create an array with size of the number of neighbors
-	int* neighbors = new int[numNeighbors];
-	int counter = 0;
+	int* neighbors = new int[numNeighbors+1];
+	int counter = 1;
+
+	neighbors[0] = numNeighbors; // the first index in the array holds size
 
 	// iterate through the matrix again and store the value of each node
 	// that is a neighbor in the neighbors array
@@ -332,6 +343,11 @@ int* AdjMatrix::getNeighbors(int node){
 	}
 
 	return neighbors;
+}
+ostream& operator<<(ostream& stream, const AdjMatrix& M){
+	// overload the << operator for AdjMatrix
+	stream << "adj matrix ostream" << endl;
+	return stream;
 }
 
 
@@ -435,45 +451,62 @@ int* AdjList::getNeighbors(int node){
 	int numNeighbors = (*_myList[node]).size();
 
 	// create an arry of the nieghbors of the given node
-	int* neighbors = new int[numNeighbors];
+	int* neighbors = new int[numNeighbors + 1];
+
+	neighbors[0] = numNeighbors; // first index holds size of array
 
 	// transfer the information of the neighbors into the int array
 	for(int i = 0; i < numNeighbors; ++i){
-	  	neighbors[i] = (*_myList[node]).infoAt(i);
+	  	neighbors[i+1] = (*_myList[node]).infoAt(i);
 	}
 
 	return neighbors;
 }
-
-void BFS(int node, bool* visited, queue<int> Q, Graph g){
-
-	Q.push(node);
-	visited[node] = true;
-
-	while(!Q.empty()){
-		int currNode = Q.front(); // get the element at the front
-		Q.pop(); // remove the element at the front
-
-		// for each unvisited neighbor of the currNode
-		g.getNeighbors(currNode);
-
-
-	}
-
+ostream& operator<<(ostream& stream, const AdjList& M){
+	stream << "adj list ostream" << endl;
+	return stream;
 }
 
-void startBFS(Graph g, int firstNode){
-	int size = g.size();
-	bool* visited = new bool[size];
-	queue<int>* Q = new queue<int>();
+void BFS(int node, Graph* g){
 
+	// starting vars
+	int size = (*g).size();
+	queue<int>* Q = new queue<int>();
+	int* parents = new int[size]; // the parent array
+	bool visited[size];
+
+	// initalize visited array
 	for(int i = 0; i < size; ++i){
 		visited[i] = false;
 	}
 
-	//BFS(firstNode, visited, Q, g);
 
-	delete[] visited;
+	// add first node to the queue and modify visited
+	(*Q).push(node);
+	visited[node] = true;
+
+	// use the while loop to iterate through the rest of the graph
+	while(!(*Q).empty()){
+		int currNode = (*Q).front(); // get the element at the front
+		(*Q).pop(); // remove the element at the front
+
+		// for each unvisited neighbor of the currNode
+		int* neighbors = (*g).getNeighbors(currNode);
+		int size = neighbors[0];
+
+		for(int i = 0; i < size; ++i){
+			int neighborNode = neighbors[i+1];
+			// visited == true if so
+			if(!visited[neighborNode]){
+				parents[neighborNode] = currNode;
+				visited[neighborNode] = true;
+				(*Q).push(neighborNode);
+			}
+		}
+
+
+	}
+
 }
 
 //void DFS(int node, int* visited){
@@ -518,5 +551,8 @@ int main(){
 		(*myAM).addEdge(x, y);
 		(*myAL).addEdge(x, y);
 	}
+
+
+	BFS(0, myAM);
 
 }
