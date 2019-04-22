@@ -345,8 +345,18 @@ int* AdjMatrix::getNeighbors(int node){
 	return neighbors;
 }
 ostream& operator<<(ostream& stream, const AdjMatrix& M){
+	int** matrix = M._myMatrix;
 	// overload the << operator for AdjMatrix
-	stream << "adj matrix ostream" << endl;
+
+	stream << " 0 0 1 2 3 4 5 6 " << endl;
+	for(int i = 0; i < M._size; ++i){
+		stream << " " << i << " ";
+		for(int j = 0; j < M._size; ++j){
+			stream << matrix[i][j] << " ";
+		}
+		stream << endl;
+
+	}
 	return stream;
 }
 
@@ -463,11 +473,24 @@ int* AdjList::getNeighbors(int node){
 	return neighbors;
 }
 ostream& operator<<(ostream& stream, const AdjList& M){
-	stream << "adj list ostream" << endl;
+
+	LinkedList<int>* list = (*M._myList);
+
+	for(int i = 0; i < M._size; ++i){
+		stream << i << ":";
+		int size = list[i].size();
+
+		for(int j = 0; j < size; ++j){
+			stream <<  " " << list[i].infoAt(j);
+		}
+
+		stream << endl;
+
+	}
 	return stream;
 }
 
-void BFS(int node, Graph* g){
+int* BFS(int node, Graph* g){
 
 	// starting vars
 	int size = (*g).size();
@@ -480,11 +503,11 @@ void BFS(int node, Graph* g){
 		visited[i] = false;
 	}
 
+	parents[node] = -1; // parent of the root node is -1
 
 	// add first node to the queue and modify visited
 	(*Q).push(node);
 	visited[node] = true;
-
 	// use the while loop to iterate through the rest of the graph
 	while(!(*Q).empty()){
 		int currNode = (*Q).front(); // get the element at the front
@@ -506,6 +529,8 @@ void BFS(int node, Graph* g){
 
 
 	}
+
+	return parents;
 
 }
 
@@ -538,21 +563,36 @@ void BFS(int node, Graph* g){
 
 int main(){
 
-	int numNodes, x, y;
+	int numNodes;
+	double x, y;
 
 	cin >> numNodes;
 
+	// create the two graphs
 	AdjMatrix* myAM = new AdjMatrix(numNodes);
 	AdjList* myAL = new AdjList(numNodes);
 
-	while(!cin.eof()){
+	// for every edge, add that edge to the graph implementations
+	for(int i = 0; i < 10; ++i){
 		cin >> x >> y;
 
 		(*myAM).addEdge(x, y);
 		(*myAL).addEdge(x, y);
 	}
 
+	//cout << "matrix " << endl;
+	//cout << (*myAM) << endl;
+	cout << "list " << endl;
+	cout << (*myAL) << endl;
 
-	BFS(0, myAM);
+	// perform a BFS and output the parent array
+	cout << "before bfs" << endl;
+	int* parents = BFS(0, myAM);
+	cout << "after bfs" << endl;
+
+	for(int i = 0; i < numNodes; ++i){
+		cout << "(" << i << ", " << parents[i] << ")";
+	}
+	cout << endl;
 
 }
