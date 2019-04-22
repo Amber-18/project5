@@ -36,8 +36,9 @@ protected:
 
 public:
 	virtual void addEdge(int a, int b);
-	int size();
-	virtual ~Graph();
+	int size(){ return _size; };
+	virtual int* getNeighbors(int node){ return new int(0); };
+	~Graph(){};
 };
 
 class AdjMatrix: public Graph {
@@ -53,6 +54,7 @@ public:
 	int size();
 	void addEdge(int a, int b);
 	AdjMatrix& operator=(const AdjMatrix& M);
+	int* getNeighbors(int node);
 
 };
 
@@ -69,13 +71,16 @@ public:
 	int size();
 	void addEdge(int a, int b);
 	AdjList& operator=(const AdjList& M);
+	int* getNeighbors(int node);
 
 };
 
 int Graph::size(){
 	return _size;
 }
+Graph::~Graph(){
 
+}
 ///////  Linked List implementations
 
 
@@ -273,9 +278,6 @@ AdjMatrix::~AdjMatrix(){
 
 	delete[] _myMatrix;
 }
-//int AdjMatrix::size(){
-//	return _size;
-//}
 void AdjMatrix::addEdge(int a, int b){
 	// add an edge to this graph
 	// the edge is represented as a connection between the two nodes, a and b
@@ -305,6 +307,31 @@ AdjMatrix& AdjMatrix::operator=(const AdjMatrix& M){
 	}
 
 	return *this;
+}
+int* AdjMatrix::getNeighbors(int node){
+	int numNeighbors = 0;
+
+	// find how many neighbors the given node has
+	for(int i = 0; i < _size; ++i){
+		if(_myMatrix[node][i] == 1){
+			++numNeighbors;
+		}
+	}
+
+	// create an array with size of the number of neighbors
+	int* neighbors = new int[numNeighbors];
+	int counter = 0;
+
+	// iterate through the matrix again and store the value of each node
+	// that is a neighbor in the neighbors array
+	for(int i = 0; i < _size; ++i){
+		if(_myMatrix[node][i] == 1){
+			neighbors[counter] = i;
+			counter++;
+		}
+	}
+
+	return neighbors;
 }
 
 
@@ -367,10 +394,6 @@ AdjList::~AdjList(){
 
 	delete[] _myList;
 }
-//int AdjList::size(){
-//	// return the number of nodes in this list
-//	return _size;
-//}
 void AdjList::addEdge(int a, int b){
 	// add the indices (a,b) and (b,a) to this list
 	(*_myList[a]).add(b);
@@ -406,7 +429,21 @@ AdjList& AdjList::operator=(const AdjList& M){
 
 	return *this;
 }
+int* AdjList::getNeighbors(int node){
 
+	// get the size of the list of neighbors for the given node
+	int numNeighbors = (*_myList[node]).size();
+
+	// create an arry of the nieghbors of the given node
+	int* neighbors = new int[numNeighbors];
+
+	// transfer the information of the neighbors into the int array
+	for(int i = 0; i < numNeighbors; ++i){
+	  	neighbors[i] = (*_myList[node]).infoAt(i);
+	}
+
+	return neighbors;
+}
 
 void BFS(int node, bool* visited, queue<int> Q, Graph g){
 
@@ -414,10 +451,11 @@ void BFS(int node, bool* visited, queue<int> Q, Graph g){
 	visited[node] = true;
 
 	while(!Q.empty()){
-		int currNode = Q.front();
-		Q.pop();
+		int currNode = Q.front(); // get the element at the front
+		Q.pop(); // remove the element at the front
 
-		// for each unvisited neighbor of k
+		// for each unvisited neighbor of the currNode
+		g.getNeighbors(currNode);
 
 
 	}
@@ -433,7 +471,7 @@ void startBFS(Graph g, int firstNode){
 		visited[i] = false;
 	}
 
-	BFS(firstNode, visited, Q, g);
+	//BFS(firstNode, visited, Q, g);
 
 	delete[] visited;
 }
