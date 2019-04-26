@@ -3,6 +3,33 @@
 #include <list>
 using namespace std;
 
+template <class DT>
+class LinkedList{
+private:
+	DT* _info;
+	LinkedList<DT>* _next;
+public:
+	LinkedList();
+	LinkedList(DT& M);
+	LinkedList(DT& M, LinkedList<DT>* next);
+	~LinkedList();
+
+	DT& info(); // return this _info
+	LinkedList<DT>* next(); // return this _next
+	bool isEmpty(); // return if this is empty
+	void add(DT& M); // adds object to beginning of list
+	LinkedList<DT>* setNext(LinkedList<DT>* M); // sets this _next = M, returns the previous value of _next
+	void insertAt(DT& M, int pos); // inserts M into the specified position
+	DT& infoAt(int pos); // returns the object at the specified position
+	DT& remove(); // removes and returns the first link in the linked list
+	DT& removeAt(int pos); // removes the link at the specified position
+	int size(); // return the size of this linked list
+	DT& operator[](int pos); // returns the object at the specified position
+
+	void setNext(LinkedList<DT>& M);
+
+};
+
 class Graph{
 protected:
 	int _size;
@@ -379,6 +406,7 @@ int* BFS(int node, Graph* g){
 
 	}
 
+	delete Q;
 	return parents;
 
 }
@@ -412,6 +440,7 @@ int* BFS(int node, Graph* g){
 
 int main(){
 
+	int* parents; // parent array for BFS and DFS
 	int numNodes;
 	double x, y;
 
@@ -446,7 +475,7 @@ int main(){
 	delete copyOfAL;
 
 	// Display the overloaded '=' operator (both Adj matrix and Adj list)
-	*copyOfAL = *myAL;
+	//*copyOfAL = *myAL;
 	*copyOfAM = *myAM;
 	cout << "Display the copy of the adjacency matrix " << endl;
 	cout << *copyOfAM;
@@ -457,8 +486,6 @@ int main(){
 
 
 	// And so display the copied graph in the same format.
-	// Display the BFS(both Adj matrix and Adj list) and DFS(both Adj matrix and Adj list)
-	// in the parent array format as given in the previous project.
 
 
     cout << "testing the original objects" << endl;
@@ -468,13 +495,48 @@ int main(){
 	cout << (*myAL) << endl;
 
 	// perform a BFS and output the parent array
-	cout << "before bfs" << endl;
-	int* parents = BFS(0, myAM);
-	cout << "after bfs" << endl;
+	cout << "Display BFS on AdjMatrix parent array:" << endl;
+	parents = BFS(0, myAM);
 
-	for(int i = 0; i < numNodes; ++i){
-		cout << "(" << i << ", " << parents[i] << ")";
+	// display the BFS parents array for both AdjList and AdjMatrix
+	cout << "0: " << parents[0];
+	for(int i = 1; i < numNodes; ++i){
+		cout << "  " << i << ": " << parents[i];
 	}
-	cout << endl;
+	delete[] parents;
+
+	// perform a BFS and output the parent array
+	cout << "Display BFS on AdjList parent array:" << endl;
+	parents = BFS(0, myAL);
+
+	// display the BFS parents array for both AdjList and AdjMatrix
+	cout << "0: " << parents[0];
+	for(int i = 1; i < numNodes; ++i){
+		cout << "  " << i << ": " << parents[i];
+	}
+	delete[] parents;
+
+	// perform a BFS and output the parent array
+	cout << "Display DFS on AdjMatrix parent array:" << endl;
+	//parents = DFS(0, myAM);
+
+	// display the BFS parents array for both AdjList and AdjMatrix
+	cout << "0: " << parents[0];
+	for(int i = 1; i < numNodes; ++i){
+		cout << "  " << i << ": " << parents[i];
+	}
+	delete[] parents;
+
+	// perform a BFS and output the parent array
+	cout << "Display DFS on AdjList parent array:" << endl;
+	//parents = DFS(0, myAL);
+
+	// display the BFS parents array for both AdjList and AdjMatrix
+	cout << "0: " << parents[0];
+	for(int i = 1; i < numNodes; ++i){
+		cout << "  " << i << ": " << parents[i];
+	}
+	delete[] parents;
+
 
 }
