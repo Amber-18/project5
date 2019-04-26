@@ -3,34 +3,6 @@
 #include <list>
 using namespace std;
 
-
-template <class DT>
-class LinkedList{
-private:
-	DT* _info;
-	LinkedList<DT>* _next;
-public:
-	LinkedList();
-	LinkedList(DT& M);
-	LinkedList(DT& M, LinkedList<DT>* next);
-	~LinkedList();
-
-	DT& info(); // return this _info
-	LinkedList<DT>* next(); // return this _next
-	bool isEmpty(); // return if this is empty
-	void add(DT& M); // adds object to beginning of list
-	LinkedList<DT>* setNext(LinkedList<DT>* M); // sets this _next = M, returns the previous value of _next
-	void insertAt(DT& M, int pos); // inserts M into the specified position
-	DT& infoAt(int pos); // returns the object at the specified position
-	DT& remove(); // removes and returns the first link in the linked list
-	DT& removeAt(int pos); // removes the link at the specified position
-	int size(); // return the size of this linked list
-	DT& operator[](int pos); // returns the object at the specified position
-
-	void setNext(LinkedList<DT>& M);
-
-};
-
 class Graph{
 protected:
 	int _size;
@@ -62,7 +34,8 @@ public:
 class AdjList: public Graph {
 protected:
 	int _size;
-	LinkedList<int>** _myList;
+	list<int>** _myList;
+	int numEdges;
 
 public:
 	AdjList();
@@ -87,151 +60,6 @@ int* Graph::getNeighbors(int node){
 }
 Graph::~Graph(){
 
-}
-
-
-///////  Linked List implementations
-
-
-template <class DT>
-LinkedList<DT>::LinkedList(){
-	_info = NULL;
-	_next = NULL;
-}
-template <class DT>
-LinkedList<DT>::LinkedList(DT& M){
-	_info = new DT(M);
-	_next = NULL;
-}
-template <class DT>
-LinkedList<DT>::LinkedList(DT& M, LinkedList<DT>* next){
-	_info = new DT(M);
-	_next = next;
-}
-template <class DT>
-LinkedList<DT>::~LinkedList(){
-	if(_info != NULL){  // deletes the contents of this box
-		delete _info;
-		_info = NULL;
-	}
-	if(_next != NULL){
-		delete _next; // and now to delete the next box if _next != NULL
-		_next = NULL;
-	}
-}
-template <class DT>
-DT& LinkedList<DT>::info(){
-	return (*_info);
-}
-template <class DT>
-LinkedList<DT>* LinkedList<DT>::next(){
-	return _next;
-}
-template <class DT>
-bool LinkedList<DT>::isEmpty(){
-	return _info == NULL;
-}
-template <class DT>
-int LinkedList<DT>::size(){
-	// recursive method
-	if(_info == NULL){           // if this link doesn't exist, return 0
-		return 0;
-	} else if(_next == NULL){    // if this link does exist but _next doesn't, return 1
-		return 1;
-	} else {
-		return 1 + (*_next).size();  // if this link exists, and _next also, return 1 + ~~~
-	}
-}
-template <class DT>
-void LinkedList<DT>::add(DT& M){
-
-	// make sure M is not on the stack, but on the heap or M will be deleted from the LL
-	// after the stack is done with
-
-	if (_info == NULL){
-		_info = &M; // if this link does not exist (starting the list), add first link M
-		_next = NULL; // set ptr to next link to NULL
-
-	} else { // if this link does exist
-		// create a copy of this link
-		LinkedList<DT>* temp = new LinkedList((*_info), _next);
-		_info = &M; // set this link's info to the new info
-		_next = temp; // set this links next to point to temp
-	}
-
-}
-template <class DT>
-void LinkedList<DT>::insertAt(DT& M, int pos){
-
-	if(pos == 0){  // base case
-		add(M);    // add DT x at this link
-
-	} else {
-
-		if(_next == NULL){
-			_next = new LinkedList(M, NULL);
-
-		} else {
-			(*_next).insertAt(M, pos-1); // recursively find where to insert x
-		}
-
-	}
-}
-template <class DT>
-DT& LinkedList<DT>::remove(){
-
-	DT* copyOf;
-
-
-	if(_info != NULL){ // if this link does exist
-		copyOf = _info;
-		///delete _info;  // delete this current link info // delete
-		_info = NULL;
-
-
-		if(_next != NULL){   // if _next link does exist
-			LinkedList<DT>* temp = _next; // create a temp link ptr to the next link
-			_info = &(*temp).info(); // this link info is next links info
-			_next = (*temp).next(); // this link next is next links next
-
-			(*temp)._info = NULL; // use temp link ptr to delete next link
-			(*temp)._next = NULL; // now this link has next link data and next link is deleted
-			delete temp;
-		}
-
-	// return copy of _info, else NULL
-	return *copyOf;
-
-	} else{ // if this link does not exist
-
-		copyOf = new DT();
-		return *copyOf; // no idea what happens here, can't return NULL, find out later
-	}
-}
-template <class DT>
-DT& LinkedList<DT>::removeAt(int pos){
-
-	if(pos == 0){
-		return remove();
-	} else {
-		return (*_next).removeAt(pos-1);
-	}
-
-
-}
-template <class DT>
-DT& LinkedList<DT>::infoAt(int pos){
-
-	if(pos == 0){
-		return (*_info);
-	} else{
-		return (*_next).infoAt(pos -1);
-	}
-
-}
-template <class DT>
-DT& LinkedList<DT>::operator[](int pos){
-	return infoAt(pos);
 }
 
 
@@ -348,15 +176,27 @@ ostream& operator<<(ostream& stream, const AdjMatrix& M){
 	int** matrix = M._myMatrix;
 	// overload the << operator for AdjMatrix
 
-	stream << " 0 0 1 2 3 4 5 6 " << endl;
+	int counter = 0;
+	// for every node i
 	for(int i = 0; i < M._size; ++i){
-		stream << " " << i << " ";
+
+		// for every nieghbor j of that node
 		for(int j = 0; j < M._size; ++j){
-			stream << matrix[i][j] << " ";
+			if(counter == 0){ // if this is the first edge
+				if(matrix[i][j] == 1){ // if the current index = 1 (there is an edge)
+					stream << "(" << i << ", " << j << ")";
+					counter = 1;
+				}
+			} else { // this is not the first edge
+				if(matrix[i][j] == 1){ // there is an edge at the current index
+					stream << ", (" << i << ", " << j << ")";
+				}
+			}
 		}
-		stream << endl;
 
 	}
+
+
 	return stream;
 }
 
@@ -367,42 +207,45 @@ ostream& operator<<(ostream& stream, const AdjMatrix& M){
 AdjList::AdjList(){
 	// default constructor, set size to 10
 	_size = 10;
-	_myList = new LinkedList<int>*[10];
-
+	_myList = new list<int>*[10];
+    numEdges = 0;
 	// initiliaze each index as an empty LL link
 	for(int i = 0; i < _size; ++i){
-		_myList[i] = new LinkedList<int>();
+		_myList[i] = new list<int>();
 	}
 }
 AdjList::AdjList(int size){
 	// constructor with size param, set size to size param
 	_size = size;
-	_myList = new LinkedList<int>*[size];
+	_myList = new list<int>*[size];
+     numEdges = 0;
 
 	// initiliaze each index as an empty LL link
 	for(int i = 0; i < size; ++i){
-		_myList[i] = new LinkedList<int>();
+		_myList[i] = new list<int>();
 	}
 }
 AdjList::AdjList(AdjList& M){
 	// copy constructor, copy the size from M, construct this list
 	// then copy M's list into this list
 	_size = M._size;
-	_myList = new LinkedList<int>*[_size];
+	_myList = new list<int>*[_size];
+	numEdges = M.numEdges;
 
-	// for every node in the graph
+	// for every node i in the graph
 	for(int i = 0; i < _size; ++i){
 
-		int MListSize = (*M._myList[i]).size();
-
 		// for every node in the LL in index i in M's list
-		for(int j = 0; j < MListSize; ++j){
+		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
 			// add a copy of  node to this list LL at the same index i
 			// get info from node j, index i in M.list
-			int mListInfo = (*M._myList[i]).infoAt(j);
+			int data = *iter;
+
+			cout << "node: " << i << " data: " << data << endl;
+
 			// add a new node with that info to to the list at index i
 			// in this list
-			(*_myList[i]).add(mListInfo);
+			(*_myList[i]).emplace_back(data);
 		}
 
 	}
@@ -422,8 +265,9 @@ AdjList::~AdjList(){
 }
 void AdjList::addEdge(int a, int b){
 	// add the indices (a,b) and (b,a) to this list
-	(*_myList[a]).add(b);
-	(*_myList[b]).add(a);
+	(*_myList[a]).emplace_back(b);
+	(*_myList[b]).emplace_back(a);
+	++numEdges;
 }
 AdjList& AdjList::operator=(const AdjList& M){
 
@@ -434,21 +278,20 @@ AdjList& AdjList::operator=(const AdjList& M){
 	// copy the size from M, construct this list
 	// then copy M's list into this list
 	_size = M._size;
-	_myList = new LinkedList<int>*[_size];
+	_myList = new list<int>*[_size];
 
 	// for every node in the graph
 	for(int i = 0; i < _size; ++i){
 
-		int MListSize = (*M._myList[i]).size();
-
 		// for every node in the LL in index i in M's list
-		for(int j = 0; j < MListSize; ++j){
+		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
 			// add a copy of  node to this list LL at the same index i
 			// get info from node j, index i in M.list
-			int mListInfo = (*M._myList[i]).infoAt(j);
+			int data = *iter;
+
 			// add a new node with that info to to the list at index i
 			// in this list
-			(*_myList[i]).add(mListInfo);
+			(*_myList[i]).emplace_back(data);
 		}
 
 	}
@@ -465,28 +308,34 @@ int* AdjList::getNeighbors(int node){
 
 	neighbors[0] = numNeighbors; // first index holds size of array
 
+	int i = 0;
 	// transfer the information of the neighbors into the int array
-	for(int i = 0; i < numNeighbors; ++i){
-	  	neighbors[i+1] = (*_myList[node]).infoAt(i);
+	for(auto iter = (*_myList[node]).cbegin(); iter != (*_myList[node]).cend(); ++iter){
+		neighbors[i+1] = *iter;
+		++i;
 	}
 
 	return neighbors;
 }
 ostream& operator<<(ostream& stream, const AdjList& M){
 
-	LinkedList<int>* list = (*M._myList);
+	int counter = 0; // counter for the first edge vs all other edges
+	// for every node in M
+	for(int node = 0; node < M._size; ++node){
 
-	for(int i = 0; i < M._size; ++i){
-		stream << i << ":";
-		int size = list[i].size();
+		// for every neighbor
+		for(auto neighbor = (*M._myList[node]).cbegin(); neighbor != (*M._myList[node]).cend(); ++neighbor){
+			if(counter == 0){ // on first run, put no comma
+				stream << "(" << node << ", " << *neighbor << ")";
+				counter = 1;
+			} else { // on all other runs, put the comma before
+				stream << ", (" << node << ", " << *neighbor << ")";
+			}
 
-		for(int j = 0; j < size; ++j){
-			stream <<  " " << list[i].infoAt(j);
 		}
 
-		stream << endl;
-
 	}
+
 	return stream;
 }
 
@@ -580,9 +429,42 @@ int main(){
 		(*myAL).addEdge(x, y);
 	}
 
-	//cout << "matrix " << endl;
-	//cout << (*myAM) << endl;
-	cout << "list " << endl;
+	// Display the two graphs, the Adj matrix and Adj list objects
+	cout << "Display the adjacency matrix " << endl;
+	cout << (*myAM) << endl;
+	cout << "Display the adjacency list " << endl;
+	cout << (*myAL) << endl;
+
+	// Display the copy constructor (both Adj matrix and Adj list)
+	AdjList* copyOfAL = new AdjList(*myAL);
+	AdjMatrix* copyOfAM = new AdjMatrix(*myAM);
+	cout << "Display the copy of the adjacency matrix " << endl;
+	cout << *copyOfAM;
+	cout << "Display the copy of the adjacency list " << endl;
+	cout << *copyOfAL;
+	delete copyOfAM;
+	delete copyOfAL;
+
+	// Display the overloaded '=' operator (both Adj matrix and Adj list)
+	*copyOfAL = *myAL;
+	*copyOfAM = *myAM;
+	cout << "Display the copy of the adjacency matrix " << endl;
+	cout << *copyOfAM;
+	cout << "Display the copy of the adjacency list " << endl;
+	cout << *copyOfAL;
+	delete copyOfAM;
+	delete copyOfAL;
+
+
+	// And so display the copied graph in the same format.
+	// Display the BFS(both Adj matrix and Adj list) and DFS(both Adj matrix and Adj list)
+	// in the parent array format as given in the previous project.
+
+
+    cout << "testing the original objects" << endl;
+	cout << "Display the adjacency matrix " << endl;
+	cout << (*myAM) << endl;
+	cout << "Display the adjacency list " << endl;
 	cout << (*myAL) << endl;
 
 	// perform a BFS and output the parent array
