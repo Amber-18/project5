@@ -262,18 +262,20 @@ AdjList::AdjList(AdjList& M){
 	// for every node i in the graph
 	for(int i = 0; i < _size; ++i){
 
-		// for every node in the LL in index i in M's list
-		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
-			// add a copy of  node to this list LL at the same index i
-			// get info from node j, index i in M.list
-			int data = *iter;
+		_myList[i] = new list<int>(*M._myList[i]);
 
-			cout << "node: " << i << " data: " << data << endl;
-
-			// add a new node with that info to to the list at index i
-			// in this list
-			(*_myList[i]).emplace_back(data);
-		}
+//		// for every node in the LL in index i in M's list
+//		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
+//			// add a copy of  node to this list LL at the same index i
+//			// get info from node j, index i in M.list
+//			int data = *iter;
+//
+//			cout << "node: " << i << " data: " << data << endl;
+//
+//			// add a new node with that info to to the list at index i
+//			// in this list
+//			(*_myList[i]).emplace_back(data);
+//		}
 
 	}
 }
@@ -310,16 +312,18 @@ AdjList& AdjList::operator=(const AdjList& M){
 	// for every node in the graph
 	for(int i = 0; i < _size; ++i){
 
-		// for every node in the LL in index i in M's list
-		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
-			// add a copy of  node to this list LL at the same index i
-			// get info from node j, index i in M.list
-			int data = *iter;
+		_myList[i] = new list<int>(*M._myList[i]);
 
-			// add a new node with that info to to the list at index i
-			// in this list
-			(*_myList[i]).emplace_back(data);
-		}
+//		// for every node in the LL in index i in M's list
+//		for(auto iter = (*M._myList[i]).cbegin(); iter != (*M._myList[i]).cend(); ++iter){
+//			// add a copy of  node to this list LL at the same index i
+//			// get info from node j, index i in M.list
+//			int data = *iter;
+//
+//			// add a new node with that info to to the list at index i
+//			// in this list
+//			(*_myList[i]).emplace_back(data);
+//		}
 
 	}
 
@@ -459,28 +463,28 @@ int main(){
 	}
 
 	// Display the two graphs, the Adj matrix and Adj list objects
-	cout << "Display the adjacency matrix " << endl;
+	cout << "Display the adjacency matrix             ";// << endl;
 	cout << (*myAM) << endl;
-	cout << "Display the adjacency list " << endl;
+	cout << "Display the adjacency list               ";// << endl;
 	cout << (*myAL) << endl;
 
 	// Display the copy constructor (both Adj matrix and Adj list)
 	AdjList* copyOfAL = new AdjList(*myAL);
 	AdjMatrix* copyOfAM = new AdjMatrix(*myAM);
-	cout << "Display the copy of the adjacency matrix " << endl;
-	cout << *copyOfAM;
-	cout << "Display the copy of the adjacency list " << endl;
-	cout << *copyOfAL;
+	cout << "Display the copy of the adjacency matrix ";// << endl;
+	cout << *copyOfAM << endl;
+	cout << "Display the copy of the adjacency list   ";// << endl;
+	cout << *copyOfAL << endl;
 	delete copyOfAM;
 	delete copyOfAL;
 
 	// Display the overloaded '=' operator (both Adj matrix and Adj list)
-	//*copyOfAL = *myAL;
+	*copyOfAL = *myAL;
 	*copyOfAM = *myAM;
-	cout << "Display the copy of the adjacency matrix " << endl;
-	cout << *copyOfAM;
-	cout << "Display the copy of the adjacency list " << endl;
-	cout << *copyOfAL;
+	cout << "Display the AAAA of the adjacency matrix ";// << endl;
+	cout << *copyOfAM << endl;
+	cout << "Display the AAAA of the adjacency list   ";// << endl;
+	cout << *copyOfAL << endl;
 	delete copyOfAM;
 	delete copyOfAL;
 
@@ -489,16 +493,24 @@ int main(){
 
 
     cout << "testing the original objects" << endl;
-	cout << "Display the adjacency matrix " << endl;
+	cout << "Display the adjacency matrix ";// << endl;
 	cout << (*myAM) << endl;
-	cout << "Display the adjacency list " << endl;
+	cout << "Display the adjacency list   ";// << endl;
 	cout << (*myAL) << endl;
+
+
+
+
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+	// display the BFS and DFS parents array for both AdjList and AdjMatrix
+
+
 
 	// perform a BFS and output the parent array
 	cout << "Display BFS on AdjMatrix parent array:" << endl;
 	parents = BFS(0, myAM);
-
-	// display the BFS parents array for both AdjList and AdjMatrix
 	cout << "0: " << parents[0];
 	for(int i = 1; i < numNodes; ++i){
 		cout << "  " << i << ": " << parents[i];
@@ -508,30 +520,24 @@ int main(){
 	// perform a BFS and output the parent array
 	cout << "Display BFS on AdjList parent array:" << endl;
 	parents = BFS(0, myAL);
-
-	// display the BFS parents array for both AdjList and AdjMatrix
 	cout << "0: " << parents[0];
 	for(int i = 1; i < numNodes; ++i){
 		cout << "  " << i << ": " << parents[i];
 	}
 	delete[] parents;
 
-	// perform a BFS and output the parent array
+	// perform a DFS and output the parent array
 	cout << "Display DFS on AdjMatrix parent array:" << endl;
 	//parents = DFS(0, myAM);
-
-	// display the BFS parents array for both AdjList and AdjMatrix
 	cout << "0: " << parents[0];
 	for(int i = 1; i < numNodes; ++i){
 		cout << "  " << i << ": " << parents[i];
 	}
 	delete[] parents;
 
-	// perform a BFS and output the parent array
+	// perform a DFS and output the parent array
 	cout << "Display DFS on AdjList parent array:" << endl;
 	//parents = DFS(0, myAL);
-
-	// display the BFS parents array for both AdjList and AdjMatrix
 	cout << "0: " << parents[0];
 	for(int i = 1; i < numNodes; ++i){
 		cout << "  " << i << ": " << parents[i];
