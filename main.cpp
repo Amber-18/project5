@@ -361,33 +361,39 @@ int* BFS(int node, Graph * g) {
 	return parents;
 
 }
+void recursiveDFS(int node, Graph* g, bool* visited, int* parents){
 
-//void DFS(int node, int* visited){
-//
-//	visited[node] = true;
-//
-//	// for every neighbor of x
-//
-//	if(!visited[neighbor]){
-//		parent[neighbor] = x;
-//		DFS(neighbor);
-//	}
-//}
-//void startDFS(Graph g){
-//	int size = g.size();
-//
-//	int* visited = new int[size];
-//
-//	for(int i = 0; i < size; ++i){
-//		visited[i] = false;
-//	}
-//
-//	int node = 0;
-//	DFS(node, visited);
-//
-//	delete[] visited;
-//
-//}
+	visited[node] = true;
+
+// for every neighbor of x
+
+	int* neighbors = (*g).getNeighbors(node);
+	int numNeighbors = neighbors[0];
+
+	for(int i = 1; i < numNeighbors; ++i){
+		int neighbor = neighbors[i];
+
+		if(!visited[neighbor]){
+			parents[neighbor] = node;
+			recursiveDFS(node, g, visited, parents);
+		}
+	}
+}
+int* DFS(int node, Graph* g){
+	int size = (*g).size();
+	bool* visited = new bool[size];
+	int* parents = new int[size];
+
+	for(int i = 0; i < size; ++i){
+		visited[i] = false;
+	}
+
+	recursiveDFS(node, g, visited, parents);
+
+	delete[] visited;
+
+	return parents;
+}
 
 int main() {
 
