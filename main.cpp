@@ -231,9 +231,6 @@ AdjList::AdjList(AdjList & M) {
 	// then copy M's list into this list
 	_size = M._size;
 	_myList = new list<int>*[_size];
-	for(int i = 0; i < _size; ++i){
-		_myList[i] = new list<int>();
-	}
 	numEdges = M.numEdges;
 
 	// for every node i in the graph
@@ -266,12 +263,8 @@ AdjList& AdjList::operator=(const AdjList & M) {
 	// overload the = operator
 	// copied the code from the copy constructor
 	// the this object is inherent in the = assignment operator
-
 	_size = M._size;
 	_myList = new list<int>*[_size];
-	for(int i = 0; i < _size; ++i){
-		_myList[i] = new list<int>();
-	}
 	numEdges = M.numEdges;
 
 	// for every node i in the graph
@@ -409,7 +402,7 @@ int main() {
 	AdjList* myAL = new AdjList(numNodes);
 
 	// for every edge, add that edge to the graph implementations
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		cin >> x >> y;
 
 		(*myAM).addEdge(x, y);
@@ -441,8 +434,6 @@ int main() {
 	cout << assignmentOfAM << endl;
 	cout << "Display the AAAA of the adjacency list   ";// << endl;
 	cout << assignmentOfAM << endl;
-	//delete copyOfAM;
-	//delete copyOfAL;
 
 
 	// And so display the copied graph in the same format.
