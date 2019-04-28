@@ -181,7 +181,10 @@ ostream& operator<<(ostream & stream, const AdjMatrix & M) {
 	for (int i = 0; i < M._size; ++i) {
 
 		// for every nieghbor j of that node
-		for (int j = 0; j < M._size; ++j) {
+		// note that j = i, as i increases, j starting point does also
+		// this means that j only covers 1/2 of the matrix
+		// edges are NOT output twice
+		for (int j = i; j < M._size; ++j) {
 			if (counter == 0) { // if this is the first edge
 				if (matrix[i][j] == 1) { // if the current index = 1 (there is an edge)
 					stream << "(" << i << ", " << j << ")";
@@ -309,19 +312,38 @@ int* AdjList::getNeighbors(int node) {
 }
 ostream& operator<<(ostream & stream, const AdjList & M) {
 
+	// create a n by n matrix to hold values
+	bool visited[M._size][M._size];
+	for (int i = 0; i < M._size; ++i) {
+		for (int j = 0; j < M._size; ++j) {
+			visited[i][j] = false; // initialize each value to false
+		}
+	}
 	int counter = 0; // counter for the first edge vs all other edges
 	// for every node in M
 	for (int node = 0; node < M._size; ++node) {
 
 		// for every neighbor
 		for (auto neighbor = (*M._myList[node]).cbegin(); neighbor != (*M._myList[node]).cend(); ++neighbor) {
-			if (counter == 0) { // on first run, put no comma
-				stream << "(" << node << ", " << *neighbor << ")";
-				counter = 1;
+
+			if(visited[node][*neighbor] == true){
+				continue;
+
+			} else {
+				if (counter == 0) { // on first run, put no comma
+					stream << "(" << node << ", " << *neighbor << ")";
+					counter = 1;
+				}
+				else { // on all other runs, put the comma before
+					stream << ", (" << node << ", " << *neighbor << ")";
+				}
+
+				// set as true both pairs for the same edge
+				visited[node][*neighbor] = true;
+				visited[*neighbor][node] = true;
 			}
-			else { // on all other runs, put the comma before
-				stream << ", (" << node << ", " << *neighbor << ")";
-			}
+
+
 
 		}
 
@@ -439,29 +461,28 @@ int main() {
 	}
 
 	// Display the two graphs, the Adj matrix and Adj list objects
-	cout << "Display the adjacency matrix             ";// << endl;
+	cout << "Display the adjacency matrix -----------------------";// << endl;
 	cout << (*myAM) << endl;
-	cout << "Display the adjacency list               ";// << endl;
+	cout << "Display the adjacency list -------------------------";// << endl;
 	cout << (*myAL) << endl;
 
 	// Display the copy constructor (both Adj matrix and Adj list)
 	AdjList* copyOfAL = new AdjList(*myAL);
 	AdjMatrix* copyOfAM = new AdjMatrix(*myAM);
-	cout << "Display the copy of the adjacency matrix ";// << endl;
+	cout << "Display the copy of the adjacency matrix -----------";// << endl;
 	cout << *copyOfAM << endl;
-	cout << "Display the copy of the adjacency list   ";// << endl;
+	cout << "Display the copy of the adjacency list -------------";// << endl;
 	cout << *copyOfAL << endl;
 	delete copyOfAM;
 	delete copyOfAL;
 
-	cout << *myAL << endl;
 
 	// Display the overloaded '=' operator (both Adj matrix and Adj list)
 	AdjList assignmentOfAL = *myAL;
     AdjMatrix assignmentOfAM = *myAM;
-	cout << "Display the AAAA of the adjacency matrix ";// << endl;
+	cout << "Display the assignment copy of the adjacency matrix ";// << endl;
 	cout << assignmentOfAM << endl;
-	cout << "Display the AAAA of the adjacency list   ";// << endl;
+	cout << "Display the assignment copy of the adjacency list --";// << endl;
 	cout << assignmentOfAM << endl;
 
 
