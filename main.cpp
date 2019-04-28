@@ -330,7 +330,7 @@ int* AdjList::getNeighbors(int node) {
 	return neighbors;
 }
 // overloaded ostream operator for AdjList
-ostream& operator<<(ostream & stream, const AdjList & M) {
+ostream& operator<<(ostream& stream, const AdjList& M) {
 
 	// create a n by n matrix to hold values
 	bool visited[M._size][M._size];
@@ -343,24 +343,55 @@ ostream& operator<<(ostream & stream, const AdjList & M) {
 	// for every node in M
 	for (int node = 0; node < M._size; ++node) {
 
-		// for every neighbor
-		for (auto neighbor = (*M._myList[node]).cbegin(); neighbor != (*M._myList[node]).cend(); ++neighbor) {
+		// the code below is copied and modified from get neighbors
+		// it creates a sorted array of neighbors of the current node
+		// it uses simple bucket sort
+		/////////////////////////
+		// get the size of the list of neighbors for the given node
+		int numNeighbors = (*M._myList[node]).size();
 
-			if(visited[node][*neighbor] == true){
+		// create an array of the nieghbors of the given node
+		int* neighbors = new int[numNeighbors];
+
+		// array of booleans, simple bucket sort to sort neighbors array
+		bool neighborBuckets[M._size]; // a bucket for every node
+		// initialize values
+		for(int i = 0; i < M._size; ++i) { neighborBuckets[i] = false; }
+
+
+		// if the neighbor exists, buckets[neighborVal] = true
+		for (auto iter = (*M._myList[node]).cbegin(); iter != (*M._myList[node]).cend(); ++iter) {
+			neighborBuckets[*iter] = true;
+		}
+
+		// the indices in buckets == true back into the neighbors array
+		int index = 0; // counter for the neighbors array
+		for(int i = 0; i < M._size; ++i){     // iterate through each bucket/node
+			if(neighborBuckets[i] == true){ // if true (there is a neighbor)
+				neighbors[index] = i;     // place the index into neighbors
+				++index;
+			}
+		}
+		///////////////////////
+
+		// for every neighbor of node in the neighbors array
+		for(int i = 0; i < numNeighbors; ++i){
+			int neighbor = neighbors[i];
+			if(visited[node][neighbor] == true){
 				continue;
 
 			} else {
 				if (counter == 0) { // on first run, put no comma
-					stream << "(" << node << ", " << *neighbor << ")";
+					stream << "(" << node << ", " << neighbor << ")";
 					counter = 1;
 				}
 				else { // on all other runs, put the comma before
-					stream << ", (" << node << ", " << *neighbor << ")";
+					stream << ", (" << node << ", " << neighbor << ")";
 				}
 
 				// set as true both pairs for the same edge
-				visited[node][*neighbor] = true;
-				visited[*neighbor][node] = true;
+				visited[node][neighbor] = true;
+				visited[neighbor][node] = true;
 			}
 
 
@@ -472,7 +503,8 @@ int main() {
 	AdjList* myAL = new AdjList(numNodes);
 
 	// for every edge, add that edge to the graph implementations
-	while(!cin.eof()) {
+	//while(!cin.eof()) {
+	for(int i = 0; i < 10; ++i){
 		cin >> x >> y;
 		(*myAM).addEdge(x, y);
 		(*myAL).addEdge(x, y);
@@ -497,7 +529,7 @@ int main() {
 
 	// Display the overloaded '=' operator (both Adj matrix and Adj list)
 	AdjList assignmentOfAL = *myAL;
-        AdjMatrix assignmentOfAM = *myAM;
+    AdjMatrix assignmentOfAM = *myAM;
 	cout << "Display the assignment copy of the adjacency matrix ";// << endl;
 	cout << assignmentOfAM << endl;
 	cout << "Display the assignment copy of the adjacency list --";// << endl;
