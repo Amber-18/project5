@@ -280,16 +280,29 @@ int* AdjList::getNeighbors(int node) {
 	// get the size of the list of neighbors for the given node
 	int numNeighbors = (*_myList[node]).size();
 
-	// create an arry of the nieghbors of the given node
+	// create an array of the nieghbors of the given node
 	int* neighbors = new int[numNeighbors + 1];
 
 	neighbors[0] = numNeighbors; // first index holds size of array
 
-	int i = 0;
-	// transfer the information of the neighbors into the int array
+	// array of booleans, simple bucket sort to sort neighbors array
+	bool neighborBuckets[_size]; // a bucket for every node
+	// initialize values
+	for(int i = 0; i < _size; ++i) { neighborBuckets[i] = false; }
+
+
+	// if the neighbor exists, buckets[neighborVal] = true
 	for (auto iter = (*_myList[node]).cbegin(); iter != (*_myList[node]).cend(); ++iter) {
-		neighbors[i + 1] = *iter;
-		++i;
+		neighborBuckets[*iter] = true;
+	}
+
+	// the indices in buckets == true back into the neighbors array
+	int counter = 1; // counter for the neighbors array
+	for(int i = 0; i < _size; ++i){     // iterate through each bucket/node
+		if(neighborBuckets[i] == true){ // if true (there is a neighbor)
+			neighbors[counter] = i;     // place the index into neighbors
+			++counter;
+		}
 	}
 
 	return neighbors;
@@ -368,6 +381,7 @@ void recursiveDFS(int node, Graph* g, bool* visited, int* parents){
 // for every neighbor of x
 
 	int* neighbors = (*g).getNeighbors(node);
+
 	int numNeighbors = neighbors[0];
 
 	for(int i = 1; i < numNeighbors; ++i){
@@ -375,18 +389,23 @@ void recursiveDFS(int node, Graph* g, bool* visited, int* parents){
 
 		if(!visited[neighbor]){
 			parents[neighbor] = node;
-			recursiveDFS(node, g, visited, parents);
+
+			recursiveDFS(neighbor, g, visited, parents);
 		}
 	}
+
+	delete[] neighbors;
 }
 int* DFS(int node, Graph* g){
 	int size = (*g).size();
 	bool* visited = new bool[size];
 	int* parents = new int[size];
 
-	for(int i = 0; i < size; ++i){
+	for(int i = 0; i < size; ++i){ // initialize the visited array
 		visited[i] = false;
 	}
+
+	parents[node] = -1; // set the parent of the root to -1
 
 	recursiveDFS(node, g, visited, parents);
 
@@ -396,6 +415,11 @@ int* DFS(int node, Graph* g){
 }
 
 int main() {
+
+	// TODO: sort parent array for adj list neighbors
+	// finish commenting
+	// fix operator<< overloads, output each edge only once
+	// use a visited array, check both indices (node, neighbor)
 
 	int* parents; // parent array for BFS and DFS
 	int numNodes;
@@ -410,7 +434,6 @@ int main() {
 	// for every edge, add that edge to the graph implementations
 	for (int i = 0; i < 10; ++i) {
 		cin >> x >> y;
-
 		(*myAM).addEdge(x, y);
 		(*myAL).addEdge(x, y);
 	}
@@ -442,21 +465,7 @@ int main() {
 	cout << assignmentOfAM << endl;
 
 
-	// And so display the copied graph in the same format.
-
-
-	cout << "testing the original objects" << endl;
-	cout << "Display the adjacency matrix ";// << endl;
-	cout << (*myAM) << endl;
-	cout << "Display the adjacency list   ";// << endl;
-	cout << (*myAL) << endl;
-
-
-	///////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////
 	// display the BFS and DFS parents array for both AdjList and AdjMatrix
-
 
 
 	// perform a BFS and output the parent array
@@ -479,9 +488,10 @@ int main() {
 	cout << endl;
 	delete[] parents;
 
+
 	// perform a DFS and output the parent array
 	cout << "Display DFS on AdjMatrix parent array:" << endl;
-	//parents = DFS(0, myAM);
+	parents = DFS(0, myAM);
 	cout << "0: " << parents[0];
 	for (int i = 1; i < numNodes; ++i) {
 		cout << "  " << i << ": " << parents[i];
@@ -491,13 +501,16 @@ int main() {
 
 	// perform a DFS and output the parent array
 	cout << "Display DFS on AdjList parent array:" << endl;
-	//parents = DFS(0, myAL);
+	parents = DFS(0, myAL);
 	cout << "0: " << parents[0];
 	for (int i = 1; i < numNodes; ++i) {
 		cout << "  " << i << ": " << parents[i];
 	}
 	cout << endl;
 	delete[] parents;
+
+	delete myAM;
+	delete myAL;
 
 
 }
