@@ -49,15 +49,19 @@ public:
 
 };
 
+// abstract method to add an edge to a graph
 void Graph::addEdge(int a, int b) {
 	// leave empty
 }
+// return size of the graph (numNodes)
 int Graph::size() {
 	return _size;
 }
+// abstract method to return neighbors of the node
 int* Graph::getNeighbors(int node) {
 	return new int(-1);
 }
+// abstract destructor
 Graph::~Graph() {
 
 }
@@ -66,6 +70,7 @@ Graph::~Graph() {
 /////// AdjMatrix Implementations
 
 
+// default constructor
 AdjMatrix::AdjMatrix() {
 	// default constructor, set matrix to 10x10 and size=10
 	_myMatrix = new int* [10];
@@ -74,6 +79,7 @@ AdjMatrix::AdjMatrix() {
 	}
 	_size = 10;
 }
+// constructor with param size = numNodes
 AdjMatrix::AdjMatrix(int size) {
 	// constuctor with variable size, set matrix to be sizeXsize and size field to size param
 	_myMatrix = new int* [size];
@@ -89,6 +95,7 @@ AdjMatrix::AdjMatrix(int size) {
 		}
 	}
 }
+// copy constructor for adj matrix
 AdjMatrix::AdjMatrix(AdjMatrix & M) {
 	// copy constructor, after transfering size var and creating this matrix using size
 	// transfer contents of matrix in M to this matrix
@@ -105,6 +112,7 @@ AdjMatrix::AdjMatrix(AdjMatrix & M) {
 		}
 	}
 }
+// destructor for adj matrix
 AdjMatrix::~AdjMatrix() {
 	//destructor
 
@@ -115,6 +123,7 @@ AdjMatrix::~AdjMatrix() {
 
 	delete[] _myMatrix;
 }
+// add an edge to this matrix
 void AdjMatrix::addEdge(int a, int b) {
 	// add an edge to this graph
 	// the edge is represented as a connection between the two nodes, a and b
@@ -123,6 +132,7 @@ void AdjMatrix::addEdge(int a, int b) {
 	_myMatrix[b][a] = 1;
 
 }
+// overload assignment to copy assignment operator
 AdjMatrix& AdjMatrix::operator=(const AdjMatrix & M) {
 	// overload the = operator
 	// copied the code from the copy constructor
@@ -145,6 +155,7 @@ AdjMatrix& AdjMatrix::operator=(const AdjMatrix & M) {
 
 	return *this;
 }
+// return the neighbors of the node in an array, first index is numNeighbors
 int* AdjMatrix::getNeighbors(int node) {
 	int numNeighbors = 0;
 
@@ -172,6 +183,7 @@ int* AdjMatrix::getNeighbors(int node) {
 
 	return neighbors;
 }
+// overload the ostream operator for adjmatrix
 ostream& operator<<(ostream & stream, const AdjMatrix & M) {
 	int** matrix = M._myMatrix;
 	// overload the << operator for AdjMatrix
@@ -208,6 +220,7 @@ ostream& operator<<(ostream & stream, const AdjMatrix & M) {
 /////// AdjList Implementations
 
 
+// default constructor, set size to 10
 AdjList::AdjList() {
 	// default constructor, set size to 10
 	_size = 10;
@@ -218,6 +231,7 @@ AdjList::AdjList() {
 		_myList[i] = new list<int>();
 	}
 }
+// constructor with param size = numNodes
 AdjList::AdjList(int size) {
 	// constructor with size param, set size to size param
 	_size = size;
@@ -229,6 +243,7 @@ AdjList::AdjList(int size) {
 		_myList[i] = new list<int>();
 	}
 }
+// copy constructor
 AdjList::AdjList(AdjList & M) {
 	// copy constructor, copy the size from M, construct this list
 	// then copy M's list into this list
@@ -242,6 +257,7 @@ AdjList::AdjList(AdjList & M) {
 		_myList[i] = new list<int>(*M._myList[i]);
 	}
 }
+// destructor for an adj list
 AdjList::~AdjList() {
 
 	// delete all LL in this list
@@ -255,12 +271,14 @@ AdjList::~AdjList() {
 
 	delete[] _myList;
 }
+// add an edge to this adj list
 void AdjList::addEdge(int a, int b) {
 	// add the indices (a,b) and (b,a) to this list
 	(*_myList[a]).emplace_back(b);
 	(*_myList[b]).emplace_back(a);
 	++numEdges;
 }
+// overload assignment operator to a copy operator
 AdjList& AdjList::operator=(const AdjList & M) {
 
 	// overload the = operator
@@ -278,6 +296,7 @@ AdjList& AdjList::operator=(const AdjList & M) {
 
 	return *this;
 }
+// return the neighbors of the given node in an array, first index is numNeighbors
 int* AdjList::getNeighbors(int node) {
 
 	// get the size of the list of neighbors for the given node
@@ -310,6 +329,7 @@ int* AdjList::getNeighbors(int node) {
 
 	return neighbors;
 }
+// overloaded ostream operator for AdjList
 ostream& operator<<(ostream & stream, const AdjList & M) {
 
 	// create a n by n matrix to hold values
@@ -352,6 +372,7 @@ ostream& operator<<(ostream & stream, const AdjList & M) {
 	return stream;
 }
 
+// a non recursive BFS function, returns the parent array
 int* BFS(int node, Graph * g) {
 
 	// starting vars
@@ -396,6 +417,7 @@ int* BFS(int node, Graph * g) {
 	return parents;
 
 }
+// a recursive function used to calculate the parent array for DFS
 void recursiveDFS(int node, Graph* g, bool* visited, int* parents){
 
 	visited[node] = true;
@@ -418,6 +440,7 @@ void recursiveDFS(int node, Graph* g, bool* visited, int* parents){
 
 	delete[] neighbors;
 }
+// a depth-first search function, calls a recursive function for calcs
 int* DFS(int node, Graph* g){
 	int size = (*g).size();
 	bool* visited = new bool[size];
@@ -438,11 +461,6 @@ int* DFS(int node, Graph* g){
 
 int main() {
 
-	// TODO: sort parent array for adj list neighbors
-	// finish commenting
-	// fix operator<< overloads, output each edge only once
-	// use a visited array, check both indices (node, neighbor)
-
 	int* parents; // parent array for BFS and DFS
 	int numNodes;
 	double x, y;
@@ -454,7 +472,7 @@ int main() {
 	AdjList* myAL = new AdjList(numNodes);
 
 	// for every edge, add that edge to the graph implementations
-	for (int i = 0; i < 10; ++i) {
+	while(!cin.eof()) {
 		cin >> x >> y;
 		(*myAM).addEdge(x, y);
 		(*myAL).addEdge(x, y);
@@ -479,7 +497,7 @@ int main() {
 
 	// Display the overloaded '=' operator (both Adj matrix and Adj list)
 	AdjList assignmentOfAL = *myAL;
-    AdjMatrix assignmentOfAM = *myAM;
+        AdjMatrix assignmentOfAM = *myAM;
 	cout << "Display the assignment copy of the adjacency matrix ";// << endl;
 	cout << assignmentOfAM << endl;
 	cout << "Display the assignment copy of the adjacency list --";// << endl;
